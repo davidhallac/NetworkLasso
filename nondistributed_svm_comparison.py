@@ -87,7 +87,7 @@ def runNonDistributed(G1, sizeOptVar, sizeData, lamb, rho, numiters, x, u, z, a,
 	for EI in G1.Edges():
 		xi = pointers[EI.GetSrcNId()]
 		xj = pointers[EI.GetDstNId()]
-		obj = obj + lamb*norm(xi - xj) #TODO: norm(x_i - x_j)
+		obj = obj + lamb*norm(xi - xj)
 
 	prob = Problem(Minimize(obj), cons)
 	result = prob.solve()#verbose=True)
@@ -291,10 +291,8 @@ def runADMM(G1, sizeOptVar, sizeData, lamb, rho, numiters, x, u, z, a, edgeWeigh
 
 def main():
 
-	#nodeList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000,2000,3000,4000] #For 20 clust
-	
 	nodeList = [10, 20, 40, 60, 80, 100, 140, 200, 240, 300, 340, 400, 440, 500, 600, 700, 800, 900, 1000,2000,3000, 4000]
-	nodeList = [5000]
+	#nodeList = [5000]
 	numattempts = nodeList.__len__()
 	times = np.zeros((numattempts,2))
 
@@ -393,7 +391,7 @@ def main():
 		t = time.time()
 		while(lamb <= thresh or lamb == 0):
 			t2 = time.time()
-			if (nodes <= 300): #Takes too long. I have results for 200, 300 already
+			if (nodes <= 300): #For quick results on subset of lambda's
 				(x, u, z, pl1, pl2) = runNonDistributed(G1, sizeOptVar, sizeData, lamb, rho + math.sqrt(lamb), numiters, x, u ,z, trainingSet, edgeWeights, numtests, useConvex, c, epsilon)
 			ellapsed_temp = time.time() - t2
 			#Get accuracy

@@ -18,7 +18,7 @@ def solveX(data):
 	neighs = data[(inputs + sizeData):data.size-4]
 	xnew = Variable(inputs,1)
 
-	#REPLACE WITH ACTUAL OBJECTIVE FUNCTION HERE! Params: Xnew (unknown), a (side data at node)
+	#Simple objective function for large scale example
 	g = 0.5*square(norm(xnew - a))
 
 	h = 0
@@ -33,12 +33,11 @@ def solveX(data):
 	p = Problem(objective, constraints)
 	result = p.solve()
 	if(result == None):
-		#CVXOPT scaling issue. Rarely happens (but occasionally does when running thousands of tests). Ignore for now
 		objective = Minimize(51*g+52*h)
 		p = Problem(objective, constraints)
 		result = p.solve(verbose=False)
 		if(result == None):
-			print "SCALING BUG"
+			print "SCALING BUG" #CVXOPT scaling issue
 			objective = Minimize(52*g+50*h)
 			p = Problem(objective, constraints)
 			result = p.solve(verbose=False)
@@ -218,7 +217,6 @@ def main():
 	t = time.time()
 	while(lamb <= thresh or lamb == 0):
 		t2 = time.time()
-		#min(lamb + 0.00001, rho + lamb/50)
 		(x, u, z, pl1, pl2) = runADMM(G1, sizeOptVar, sizeData, lamb, min(lamb + 0.00001, rho + lamb/25), numiters, x, u ,z, a, edgeWeights)
 		print "Lambda = ", lamb
 		if(lamb == 0):

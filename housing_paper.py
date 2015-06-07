@@ -27,8 +27,10 @@ def solveX(data):
 	a = data[inputs:(inputs + sizeData)]
 	neighs = data[(inputs + sizeData):data.size-5]
 	xnew = Variable(inputs,1)
+
 	#Fill in objective function here! Params: Xnew (unknown), a (side data at node)
 	g = square(xnew[0]*a[0] + xnew[1]*a[1] + xnew[2]*a[2] + xnew[3] - a[4]) + mu*(square(xnew[0]) + square(xnew[1]) + square(xnew[2]))
+	
 	h = 0
 	for i in range(neighs.size/(2*inputs+1)):
 		weight = neighs[i*(2*inputs+1)]
@@ -87,7 +89,7 @@ def runADMM(G1, sizeOptVar, sizeData, lamb, rho, numiters, x, u, z, a, edgeWeigh
 	if(useConvex != 1):
 		#Calculate objective
 		for i in range(G1.GetNodes()):
-			bestObj = bestObj + cvxObj[0,i] #0.5*math.pow(LA.norm(x[0,i]*a[0,i] + x[1,i]*a[1,i] + x[2,i]*a[2,i] + x[3,i] - a[4,i]),2) + mu*(math.pow(x[0,i],2) + math.pow(x[1,i],2) + math.pow(x[2,i],2))
+			bestObj = bestObj + cvxObj[0,i] 
 		for EI in G1.Edges():
 			weight = edgeWeights.GetDat(TIntPr(EI.GetSrcNId(), EI.GetDstNId()))
 			edgeDiff = LA.norm(x[:,node2mat.GetDat(EI.GetSrcNId())] - x[:,node2mat.GetDat(EI.GetDstNId())])
@@ -166,7 +168,7 @@ def runADMM(G1, sizeOptVar, sizeData, lamb, rho, numiters, x, u, z, a, edgeWeigh
 			tempObj = 0
 			#Calculate objective
 			for i in range(G1.GetNodes()):
-				tempObj = tempObj + cvxObj[0,i] #0.5*math.pow(LA.norm(x[0,i]*a[0,i] + x[1,i]*a[1,i] + x[2,i]*a[2,i] + x[3,i] - a[4,i]),2) + mu*(math.pow(x[0,i],2) + math.pow(x[1,i],2) + math.pow(x[2,i],2))
+				tempObj = tempObj + cvxObj[0,i]
 			initTemp = tempObj
 			for EI in G1.Edges():
 				weight = edgeWeights.GetDat(TIntPr(EI.GetSrcNId(), EI.GetDstNId()))
@@ -368,24 +370,9 @@ def main():
 			result = p.solve(verbose=False)	
 			xpred = xpred.value
 
-			# MEAN METHOD
-			# xpred = np.zeros(sizeOptVar)
-			# it = distances.BegI()
-			# sumWeights = 0
-			# for j in range(numNewNeighs):
-			# 	weight = 1/(it.GetDat()+ 0.1)
-			# 	xpred = xpred + weight*x[:,it.GetKey()]
-			# 	sumWeights = sumWeights + weight
-			# 	it.Next()
-			# xpred = xpred / sumWeights
-			
-			# if (i < 10):
-			# 	print xpred, float(dataset.GetDat(i)[4]), i
-
 			#Find MSE
 			regressors = dataset.GetDat(i)
 			prediction = xpred[0]*float(regressors[0]) + xpred[1]*float(regressors[1]) + xpred[2]*float(regressors[2]) + xpred[3]
-		#	prediction = avgPrice
 			mse = mse + math.pow(prediction - float(dataset.GetDat(i)[4]), 2)/testSetSize
 
 		cons = 0
@@ -395,7 +382,6 @@ def main():
 		consensus = cons / float(edges)
 
 		print mse, "= mse", consensus, " = consensus"
-		#sys.exit(0)
 		plot1.Add(lamb)
 		plot2.Add(mse)
 		plot3.Add(consensus)

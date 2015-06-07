@@ -29,9 +29,7 @@ def solveX(data):
 
 	mu = data[data.size-5]
 
-	#Fill in objective function here! Params: Xnew (unknown), a (side data at node)
-
-
+	#Objective function
 	g = square(norm(xnew - a)) + mu*(norm(xnew))
 
 	h = 0
@@ -46,11 +44,10 @@ def solveX(data):
 	p = Problem(objective, constraints)
 	result = p.solve()
 	if(result == None):
-		#Todo: CVXOPT scaling issue
 		objective = Minimize(g+1.001*h)
 		p = Problem(objective, constraints)
 		result = p.solve(verbose=False)
-		print "SCALING BUG"
+		print "SCALING BUG" #Strange scaling bug
 	return xnew.value, g.value
 
 def runADMM(G1, sizeOptVar, sizeData, lamb, rho, numiters, x, u, z, a, edgeWeights, useConvex, epsilon, mu):
@@ -260,7 +257,6 @@ def main():
 	dataset = TIntFltVH()
 	G1 = TUNGraph.New()
 	counter = 0
-	#for line in file:
 	while True:
 		line = file.readline() #7 --outflow
 		if not line: 
@@ -308,8 +304,8 @@ def main():
 			counter2 = counter2 + a[1, i + 48*7*j]
 			temp[j] = a[0,i + 48*7*j]
 			temp2[j] = a[1,i + 48*7*j]
-		baseline[0,i] = np.median(temp)#counter / 15
-		baseline[1,i] = np.median(temp2)#counter2 / 15
+		baseline[0,i] = np.median(temp)
+		baseline[1,i] = np.median(temp2)
 
 
 	#Subtract Baseline from a
@@ -321,21 +317,6 @@ def main():
 	x = np.zeros((sizeOptVar,nodes))
 	u = np.zeros((sizeOptVar,2*G1.GetEdges()))
 	z = np.zeros((sizeOptVar,2*G1.GetEdges()))
-
-	# #Run regularization path
-	# while(lamb <= thresh or lamb == 0):
-	# #while(False):
-	# 	(x, u, z, pl1, pl2) = runADMM(G1, sizeOptVar, sizeData, lamb, rho + math.sqrt(lamb)/2, numiters, x, u ,z, a, edgeWeights, useConvex, epsilon, mu)
-	# 	print "Lambda = ", lamb
-
-
-	# 	if(lamb == 0):
-	# 		lamb = startVal
-	# 	elif(useMult == 1):
-	# 		lamb = lamb*multUpdateVal
-	# 	else:
-	# 		lamb = lamb + addUpdateVal
-
 
 	for q in range(numTrials):
 

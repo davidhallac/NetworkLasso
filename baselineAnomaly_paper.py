@@ -13,8 +13,6 @@ import matplotlib
 matplotlib.use('Agg')
 matplotlib.rc('text',usetex=True)
 import matplotlib.pyplot as plt
-#Other function in this folder
-from z_u_solvers import solveZ, solveU
 
 
 
@@ -33,7 +31,6 @@ def main():
 	dataset = TIntFltVH()
 	G1 = TUNGraph.New()
 	counter = 0
-	#for line in file:
 	while True:
 		line = file.readline() #7 --outflow
 		if not line: 
@@ -75,15 +72,15 @@ def main():
 			counter2 = counter2 + a[1, i + 48*7*j]
 			temp[j] = a[0,i + 48*7*j]
 			temp2[j] = a[1,i + 48*7*j]
-		baseline[0,i] = np.mean(temp)#counter / 15
-		baseline[1,i] = np.mean(temp)#counter2 / 15
+		baseline[0,i] = np.mean(temp)
+		baseline[1,i] = np.mean(temp)
 
 	x = np.zeros((nodes,1))
 	for i in range(nodes):
 		x[i,0] = ((math.exp(-1*baseline[0,i  % (48*7)]) * math.pow(baseline[0,i  % (48*7)], a[0,i])) / math.factorial(a[0,i])) * \
 			((math.exp(-1*baseline[1,i  % (48*7)]) * math.pow(baseline[1,i  % (48*7)], a[1,i])) / math.factorial(a[1,i]))
 
-	#Compare to events
+	#Compare to actual events
 	file = open("Data/CalIt2Events.csv", "rU")
 	events = TIntPrV()	
 	for line in file:
@@ -150,7 +147,6 @@ def main():
 			end = meeting.GetVal2()
 			counter = start
 			while (counter <= end):
-				#if(x[0,counter] + x[1,counter] >= eventThresh):
 				if(x[counter,0] < eventThresh and ((a[0,counter] > baseline[0,counter  % (48*7)]) or (a[1,counter] > baseline[1,counter  % (48*7)]))):
 					numevents = numevents + 1
 					break
